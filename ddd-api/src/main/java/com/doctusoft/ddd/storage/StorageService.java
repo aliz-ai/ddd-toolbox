@@ -62,6 +62,15 @@ public interface StorageService {
         return (int) exactSize;
     }
     
+    static byte[] getDownloadContent(StorageObject storageObject) {
+        switch (storageObject.getStorageMode()) {
+        case COMPRESSED:
+            return decompress(storageObject.getStoredContent(), storageObject.getUncompressedSize());
+        default:
+            return storageObject.getStoredContent();
+        }
+    }
+    
     int DEFAULT_BUFFER_SIZE = 1 << 16; // 64kB
     
 }

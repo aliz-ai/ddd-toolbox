@@ -126,17 +126,8 @@ public class SimpleStorageServiceImpl implements StorageService {
         return FileDownloadResponse.builder()
             .fileName(storageObject.getFileName())
             .mimeType(storageObject.getMimeType())
-            .content(getDownloadContent(storageObject))
+            .content(StorageService.getDownloadContent(storageObject))
             .build();
-    }
-    
-    protected byte[] getDownloadContent(StorageObject storageObject) {
-        switch (storageObject.getStorageMode()) {
-        case COMPRESSED:
-            return decompress(storageObject.getStoredContent(), storageObject.getUncompressedSize());
-        default:
-            return storageObject.getStoredContent();
-        }
     }
     
     protected byte[] compress(byte[] uncompressed) {
