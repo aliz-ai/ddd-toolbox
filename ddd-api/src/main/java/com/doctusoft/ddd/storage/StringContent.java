@@ -6,6 +6,8 @@ import lombok.Value;
 
 import java.nio.charset.Charset;
 
+import static java.util.Objects.*;
+
 @Value
 @Builder
 public class StringContent implements TextContent {
@@ -20,5 +22,11 @@ public class StringContent implements TextContent {
     @NonNull Charset encoding;
     
     @NonNull String textContent;
+    
+    public StringContent(String fileName, Charset encoding, String textContent) {
+        this.fileName = requireNonNull(fileName, "fileName");
+        this.encoding = requireNonNull(encoding, "encoding");
+        this.textContent = requireNonNull(textContent, "textContent");
+    }
     
 }
