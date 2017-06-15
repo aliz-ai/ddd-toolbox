@@ -26,15 +26,20 @@ public abstract class HibernatePersistence extends JpaPersistence {
         Consumer<Entity> preInsertAction = createPreInsertAction(kind);
         newEntities.forEach(preInsertAction);
         T first = newEntities.iterator().next();
+        if (newEntities.size() == 1) {
+            insert(first);
+            return;
+        }
         HibernateMultiLineInsert multiLineInsertSupport = getMultiLineInsertSupport(first);
         if (multiLineInsertSupport == null) {
             newEntities.forEach(this::insert);
-        } else {
-            Session session = em.unwrap(Session.class);
-            Iterables
-                .partition(newEntities, getMultiLineInsertLimit(kind))
-                .forEach(partition -> multiLineInsertSupport.insertInBatch(session, partition.toArray()));
+            return;
         }
+        em.flush();
+        Session session = em.unwrap(Session.class);
+        Iterables
+            .partition(newEntities, getMultiLineInsertLimit(kind))
+            .forEach(partition -> multiLineInsertSupport.insertInBatch(session, partition.toArray()));
     }
     
     protected int getMultiLineInsertLimit(Class<? extends Entity> kind) { return 1000; }
