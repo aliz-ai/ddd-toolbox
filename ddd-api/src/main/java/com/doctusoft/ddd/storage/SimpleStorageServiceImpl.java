@@ -39,10 +39,12 @@ public class SimpleStorageServiceImpl implements StorageService {
     public <T extends FileContent> EntityKey<StorageObject> createArchive(EntityKey<?> referencingEntity, String category, Collection<T> archiveEntries, String archiveBaseName) {
         StorageObject storageObject = initObject(referencingEntity, category, "application/zip");
         requireNonNull(archiveEntries, "archiveEntries");
-        checkArgument(archiveEntries.size() > 0, "No entries to archive");
+        int archiveEntriesCount = archiveEntries.size();
+        checkArgument(archiveEntriesCount > 0, "No entries to archive");
         requireNonNull(archiveBaseName, "archiveBaseName");
         storageObject.setFileName(archiveBaseName + ".zip");
         storageObject.setStorageMode(StorageObject.StorageMode.ARCHIVE);
+        storageObject.setArchiveEntriesCount(archiveEntriesCount);
         
         try (ByteArrayOutputStream buffer = new ByteArrayOutputStream(getBufferSize());
             ZipOutputStream zipArchive = new ZipOutputStream(buffer)) {
