@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -30,6 +31,7 @@ public class SimpleStorageServiceImpl implements StorageService {
         requireNonNull(mimeType, "mimeType");
         StorageObject instance = instantiator.instantiate(StorageObject.class);
         instance.setId(RandomId.sequential());
+        instance.setCreatedAt(Instant.now());
         instance.setEntityReference(referencingEntity.toString());
         instance.setCategory(category);
         instance.setMimeType(mimeType);

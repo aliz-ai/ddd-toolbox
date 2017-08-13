@@ -1,11 +1,12 @@
 package com.doctusoft.ddd.storage;
 
+import com.doctusoft.ddd.model.CreatedAt;
 import com.doctusoft.ddd.model.EntityKey;
 import com.doctusoft.ddd.model.EntityWithStringId;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface StorageObject extends EntityWithStringId {
+public interface StorageObject extends EntityWithStringId, CreatedAt {
     
     @NotNull static EntityKey<StorageObject> createKey(String id) { return EntityKey.create(StorageObject.class, id); }
     

@@ -7,6 +7,7 @@ import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Proxy;
 
 import javax.persistence.*;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -18,6 +19,9 @@ public class StorageObjectImpl implements StorageObject {
     @Id
     @Column(nullable = false, length = 36)
     private String id;
+    
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
     
     @Column(nullable = false, length = 255)
     private String category;
