@@ -2,6 +2,8 @@ package com.doctusoft.ddd.jpa.criteria;
 
 import com.doctusoft.ddd.model.Entity;
 import com.doctusoft.ddd.model.EntityClass;
+import com.doctusoft.java.Failsafe;
+import com.doctusoft.math.ClosedRange;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -91,6 +93,16 @@ public final class EntityCriteria<T extends Entity> {
         return filterId(id -> id.in(ids));
     }
     
+    public EntityCriteria<T> idInNumericRange(ClosedRange<Long> idRange) {
+        Failsafe.checkState(entityClass.hasLongId(), "Not EntityWithLongId: " + entityClass);
+        return addCondition(root -> builder.between(root.get(Entity.ID), idRange.getLowerBound(), idRange.getUpperBound()));
+    }
+    
+    public EntityCriteria<T> idInLexicographicalRange(ClosedRange<String> idRange) {
+        Failsafe.checkState(entityClass.hasStringId(), "Not EntityWithStringId: " + entityClass);
+        return addCondition(root -> builder.between(root.get(Entity.ID), idRange.getLowerBound(), idRange.getUpperBound()));
+    }
+    
     public EntityCriteria<T> idLike(String idPattern) {
         return filterId(id -> builder.like(id, idPattern));
     }
@@ -103,8 +115,7 @@ public final class EntityCriteria<T extends Entity> {
     }
     
     public EntityCriteria<T> filterId(Function<Expression<String>, Predicate> idFilter) {
-        addCondition(id().andThen(idFilter));
-        return this;
+        return addCondition(id().andThen(idFilter));
     }
     
 }
