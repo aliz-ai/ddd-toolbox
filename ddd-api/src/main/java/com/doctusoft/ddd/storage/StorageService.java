@@ -13,11 +13,11 @@ import static com.doctusoft.java.Failsafe.checkArgument;
 
 public interface StorageService {
     
-    <T extends FileContent> EntityKey<StorageObject> createArchive(EntityKey<?> referencingEntity, String category, Collection<T> archiveEntries, String archiveBaseName);
+    <T extends FileContent> StorageObject createArchive(EntityKey<?> referencingEntity, String category, Collection<T> archiveEntries, String archiveBaseName);
     
-    EntityKey<StorageObject> createFile(EntityKey<?> referencingEntity, String category, FileContent fileContent, String mimeType);
+    StorageObject createFile(EntityKey<?> referencingEntity, String category, FileContent fileContent, String mimeType);
     
-    <T extends FileContent> EntityKey<StorageObject> createFileOrArchive(EntityKey<?> referencingEntity, String category, Collection<T> archiveEntries, String archiveBaseName, String mimeType);
+    <T extends FileContent> StorageObject createFileOrArchive(EntityKey<?> referencingEntity, String category, Collection<T> archiveEntries, String archiveBaseName, String mimeType);
     
     FileDownloadResponse download(EntityKey<StorageObject> key);
     
@@ -69,6 +69,22 @@ public interface StorageService {
         default:
             return storageObject.getStoredContent();
         }
+    }
+    
+    static FileDownloadResponse getDownloadRespone(StorageObject storageObject) {
+        return FileDownloadResponse.builder()
+            .fileName(storageObject.getFileName())
+            .mimeType(storageObject.getMimeType())
+            .content(getDownloadContent(storageObject))
+            .build();
+    }
+    
+    static FileDownloadResponse downloadWithMimeType(FileContent fileContent, String mimeType) {
+        return FileDownloadResponse.builder()
+            .fileName(fileContent.getFileName())
+            .mimeType(mimeType)
+            .content(fileContent.getContent())
+            .build();
     }
     
     int DEFAULT_BUFFER_SIZE = 1 << 16; // 64kB

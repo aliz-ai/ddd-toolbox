@@ -38,7 +38,7 @@ public class SimpleStorageServiceImpl implements StorageService {
         return instance;
     }
     
-    public <T extends FileContent> EntityKey<StorageObject> createArchive(EntityKey<?> referencingEntity, String category, Collection<T> archiveEntries, String archiveBaseName) {
+    public <T extends FileContent> StorageObject createArchive(EntityKey<?> referencingEntity, String category, Collection<T> archiveEntries, String archiveBaseName) {
         StorageObject storageObject = initObject(referencingEntity, category, "application/zip");
         requireNonNull(archiveEntries, "archiveEntries");
         int archiveEntriesCount = archiveEntries.size();
@@ -90,10 +90,10 @@ public class SimpleStorageServiceImpl implements StorageService {
         }
         
         persistence.insert(storageObject);
-        return storageObject.getKey();
+        return storageObject;
     }
     
-    public EntityKey<StorageObject> createFile(EntityKey<?> referencingEntity, String category, FileContent fileContent, String mimeType) {
+    public StorageObject createFile(EntityKey<?> referencingEntity, String category, FileContent fileContent, String mimeType) {
         requireNonNull(fileContent, "fileContent");
         StorageObject storageObject = initObject(referencingEntity, category, mimeType);
         storageObject.setFileName(requireNonNull(fileContent.getFileName(), "fileName"));
@@ -113,10 +113,10 @@ public class SimpleStorageServiceImpl implements StorageService {
             storageObject.setEncoding(textContent.getEncoding().name());
         }
         persistence.insert(storageObject);
-        return storageObject.getKey();
+        return storageObject;
     }
     
-    public <T extends FileContent> EntityKey<StorageObject> createFileOrArchive(EntityKey<?> referencingEntity, String category, Collection<T> archiveEntries, String archiveBaseName, String mimeType) {
+    public <T extends FileContent> StorageObject createFileOrArchive(EntityKey<?> referencingEntity, String category, Collection<T> archiveEntries, String archiveBaseName, String mimeType) {
         if (archiveEntries.size() == 1) {
             T singleEntry = archiveEntries.iterator().next();
             return createFile(referencingEntity, category, singleEntry, mimeType);
@@ -126,12 +126,7 @@ public class SimpleStorageServiceImpl implements StorageService {
     }
     
     public FileDownloadResponse download(EntityKey<StorageObject> key) {
-        StorageObject storageObject = persistence.require(key);
-        return FileDownloadResponse.builder()
-            .fileName(storageObject.getFileName())
-            .mimeType(storageObject.getMimeType())
-            .content(StorageService.getDownloadContent(storageObject))
-            .build();
+        return StorageService.getDownloadRespone(persistence.require(key));
     }
     
     protected byte[] compress(byte[] uncompressed) {
